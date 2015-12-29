@@ -16,10 +16,10 @@ namespace CNP;
  */
 class Atom {
 
-	public static function Assemble( $module_name, $module_args ) {
+	public static function Assemble( $atom_name, $atom_args ) {
 
-		$name = $module_name;
-		$args = $module_args;
+		$name = $atom_name;
+		$args = $atom_args;
 
 		$vars       = self::ConfigureAtomArgs( $name, $args );
 		$attributes = self::ConfigureAtomAttributes( $name, $vars['attributes'] );
@@ -41,7 +41,7 @@ class Atom {
 
 		$vars = wp_parse_args( $args, $defaults );
 
-		// Usage: add_filter( '$module_name_args', $vars );
+		// Usage: add_filter( $atom_name . '_args', $vars );
 		$vars = apply_filters( $name . '_args', $vars );
 
 		return $vars;
