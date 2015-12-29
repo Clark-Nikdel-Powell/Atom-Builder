@@ -1,4 +1,6 @@
 <?php
+namespace CNP;
+
 /**
  * Atom Builder
  *
@@ -9,10 +11,10 @@
  * @package  CNP Atom Builder
  * @author   Clark Nidkel Powell
  * @link     http://www.clarknikdelpowell.com
- * @version  0.2
+ * @version  0.3
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  */
-class CNP_Atom {
+class Atom {
 
 	public static function Assemble( $module_name, $module_args ) {
 
