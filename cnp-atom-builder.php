@@ -10,7 +10,7 @@
  * @package  CNP Atom Builder
  * @author   Clark Nidkel Powell
  * @link     http://www.clarknikdelpowell.com
- * @version  0.1
+ * @version  0.2
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  */
 class CNP_Atom {
