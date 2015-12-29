@@ -1,9 +1,9 @@
 {
-	"name": "cnp/wp-module-builder",
-	"description": "Build modules of filterable code piece by piece.",
+	"name": "cnp/wp-atom-builder",
+	"description": "Build filterable atomic elements.",
 	"type": "library",
 	"license": "MIT",
-	"homepage": "https://github.com/Clark-Nikdel-Powell/Module-Builder",
+	"homepage": "https://github.com/Clark-Nikdel-Powell/Atom-Builder",
 	"authors": [
 		{
 			"name": "Josh Nederveld",
