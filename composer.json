@@ -1,0 +1,18 @@
+{
+	"name": "cnp/wp-module-builder",
+	"description": "Build modules of filterable code piece by piece.",
+	"type": "library",
+	"license": "MIT",
+	"homepage": "https://github.com/Clark-Nikdel-Powell/Module-Builder",
+	"authors": [
+		{
+			"name": "Josh Nederveld",
+			"email": "joshn@clarknikdelpowell.com",
+			"homepage": "https://clarknikdelpowell.com/agency/people/josh",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3"
+	}
+}
