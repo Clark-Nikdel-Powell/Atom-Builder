@@ -102,8 +102,8 @@ class Atom {
 	 */
 	public function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
 
-		if ( empty( $raw_attributes ) || ! isset( $raw_atom_attributes['classx'] ) ) {
-			$raw_attributes['class'] = $name;
+		if ( empty( $raw_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
+			$raw_attributes['class'] = $atom_name;
 		}
 
 		// Set up return variable
@@ -121,14 +121,14 @@ class Atom {
 				// The class attribute is double-checked against a sanitize function.
 				case 'class':
 
-					$atom_attributes['class'] = $attribute_name . '="' . self::getClasses( $name, $raw_attribute_values ) . '"';
+					$atom_attributes['class'] = $attribute_name . '="' . self::getClasses( $atom_name, $raw_attribute_values ) . '"';
 
 					break;
 
 				// The ID attribute is also double-checked against a sanitize function.
 				case 'id':
 
-					$atom_attributes['id'] = $attribute_name . '="' . self::getID( $name, $raw_attribute_values ) . '"';;
+					$atom_attributes['id'] = $attribute_name . '="' . self::getID( $atom_name, $raw_attribute_values ) . '"';;
 
 					break;
 
