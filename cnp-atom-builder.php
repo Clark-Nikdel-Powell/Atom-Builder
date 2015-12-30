@@ -11,7 +11,7 @@ namespace CNP;
  * @package  CNP Atom Builder
  * @author   Clark Nidkel Powell
  * @link     http://www.clarknikdelpowell.com
- * @version  0.3
+ * @version  0.4
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  */
 class Atom {
