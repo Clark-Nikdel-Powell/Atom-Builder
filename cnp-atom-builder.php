@@ -102,9 +102,8 @@ class Atom {
 	 */
 	public function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
 
-		/* @EXIT: sanity check */
-		if ( empty( $raw_atom_attributes ) ) {
-			return false;
+		if ( empty( $raw_attributes ) || ! isset( $raw_atom_attributes['classx'] ) ) {
+			$raw_attributes['class'] = $name;
 		}
 
 		// Set up return variable
@@ -150,6 +149,9 @@ class Atom {
 							$attribute_values = $raw_attribute_values;
 
 						}
+
+						// Filter the attribute value
+						$attribute_values = apply_filters( $atom_name . $attribute_name . '_value' , $attribute_values );
 
 						// Set up the attribute
 						$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
