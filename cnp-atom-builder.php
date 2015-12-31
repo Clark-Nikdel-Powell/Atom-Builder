@@ -11,7 +11,7 @@ namespace CNP;
  * @package  CNP Atom Builder
  * @author   Clark Nidkel Powell
  * @link     http://www.clarknikdelpowell.com
- * @version  0.4
+ * @version  0.5
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  */
 class Atom {
@@ -25,11 +25,12 @@ class Atom {
 	 *
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param array $atom_args {
+	 *      Atom arguments
 	 *
-	 * @type string $tag The atom's tag. Default: 'div'.
-	 * @type string $tag_type Use 'self-closing' for tags like <img /> or <input />. Default: ''.
-	 * @type string $content The content to insert between the atom tags.
-	 * @type array $attributes Any attributes to include on the atom's tag, like 'class' or 'id'.
+	 *      @type string $tag The atom's tag. Default: 'div'.
+	 *      @type string $tag_type Optional. Use 'self-closing' for tags like <img /> or <input />. Default: ''.
+	 *      @type string $content The content to insert between the atom tags.
+	 *      @type array $attributes Optional. Any attributes to include on the atom's tag, like 'class' or 'id'.
 	 *                              Name-value pairs become the attributes on the tag, e.g.,
 	 *                              'class' => ['class1', 'class2'] becomes class="class1 class2"
 	 *                              when the atom markup is returned. Default: '';
@@ -282,7 +283,7 @@ class Atom {
 	 *
 	 * @return string $atom_markup
 	 */
-	protected function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
+	public function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
 
 		$tag = $atom_vars['tag'];
 
