@@ -11,7 +11,7 @@ namespace CNP;
  * @package  CNP Atom Builder
  * @author   Clark Nidkel Powell
  * @link     http://www.clarknikdelpowell.com
- * @version  0.5
+ * @version  0.6
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  */
 class Atom {
@@ -27,10 +27,10 @@ class Atom {
 	 * @param array $atom_args {
 	 *      Atom arguments
 	 *
-	 *      @type string $tag The atom's tag. Default: 'div'.
-	 *      @type string $tag_type Optional. Use 'self-closing' for tags like <img /> or <input />. Default: ''.
-	 *      @type string $content The content to insert between the atom tags.
-	 *      @type array $attributes Optional. Any attributes to include on the atom's tag, like 'class' or 'id'.
+	 * @type string $tag The atom's tag. Default: 'div'.
+	 * @type string $tag_type Optional. Use 'self-closing' for tags like <img /> or <input />. Default: ''.
+	 * @type string $content The content to insert between the atom tags.
+	 * @type array $attributes Optional. Any attributes to include on the atom's tag, like 'class' or 'id'.
 	 *                              Name-value pairs become the attributes on the tag, e.g.,
 	 *                              'class' => ['class1', 'class2'] becomes class="class1 class2"
 	 *                              when the atom markup is returned. Default: '';
@@ -64,7 +64,7 @@ class Atom {
 	 *
 	 * @return array $atom_vars | Atom Vars
 	 */
-	public function ConfigureAtomArgs( $atom_name, $atom_args ) {
+	public static function ConfigureAtomArgs( $atom_name, $atom_args ) {
 
 		// Set up defaults args
 		$atom_defaults = array(
@@ -101,7 +101,7 @@ class Atom {
 	 *
 	 * @return array $atom_attributes | Atom Attributes
 	 */
-	public function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
+	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
 
 		if ( empty( $raw_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
 			$raw_attributes['class'] = $atom_name;
@@ -152,7 +152,7 @@ class Atom {
 						}
 
 						// Filter the attribute value
-						$attribute_values = apply_filters( $atom_name . $attribute_name . '_value' , $attribute_values );
+						$attribute_values = apply_filters( $atom_name . $attribute_name . '_value', $attribute_values );
 
 						// Set up the attribute
 						$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
@@ -194,7 +194,7 @@ class Atom {
 	 *
 	 * @return string $classes | A space-delimited string of classes.
 	 */
-	private function getClasses( $atom_name, $raw_classes ) {
+	private static function getClasses( $atom_name, $raw_classes ) {
 
 		$classes_arr = array();
 
@@ -240,7 +240,7 @@ class Atom {
 	 *
 	 * @return string $id | A single ID.
 	 */
-	private function getID( $atom_name, $raw_id ) {
+	private static function getID( $atom_name, $raw_id ) {
 
 		/* @EXIT: sanity check */
 		if ( ! is_string( $raw_id ) || '' == $raw_id ) {
@@ -283,9 +283,11 @@ class Atom {
 	 *
 	 * @return string $atom_markup
 	 */
-	public function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
+	public static function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
 
 		$tag = $atom_vars['tag'];
+
+		$content = apply_filters( $atom_name . '_content', $atom_vars['content'] );
 
 		// Handling the atom output differs based on the tag type.
 		switch ( $atom_vars['tag_type'] ) {
@@ -300,7 +302,7 @@ class Atom {
 			// Standard tags return text inside of the tag.
 			default:
 
-				$atom_markup = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>' . $atom_vars['content'] . '</' . $tag . '>';
+				$atom_markup = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>' . $content . '</' . $tag . '>';
 
 				break;
 		}
