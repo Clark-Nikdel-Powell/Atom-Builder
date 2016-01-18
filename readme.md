@@ -30,6 +30,7 @@ All the filters in the Atom class are namespaced to the name of the atom. An ato
 1. `$atom_name`_id: filter the ID.
 1. `$atom_name``$attribute_name`_value: filter a specific attribute's value.
 1. `$atom_name`_attributes: filter the completed attributes array.
+1. `$atom_name`_content: filter the atom content.
 1. `$atom_name`_markup: filter the compiled markup.
 
 Filtering the markup means that we can dynamically change the atom output on different areas of a site, without needing to change the atom arguments. 
