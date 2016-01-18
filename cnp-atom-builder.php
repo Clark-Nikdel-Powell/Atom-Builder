@@ -37,7 +37,7 @@ class Atom {
 	 * }
 	 * @return string $atom_markup | Atom markup
 	 */
-	public static function Assemble( $atom_name, $atom_args ) {
+	public static function Assemble( $atom_name, $atom_args=array() ) {
 
 		$atom_vars       = self::ConfigureAtomArgs( $atom_name, $atom_args );
 		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'] );
@@ -103,8 +103,8 @@ class Atom {
 	 */
 	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
 
-		if ( empty( $raw_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
-			$raw_attributes['class'] = $atom_name;
+		if ( empty( $raw_atom_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
+			$raw_atom_attributes['class'] = $atom_name;
 		}
 
 		// Set up return variable
@@ -289,6 +289,9 @@ class Atom {
 
 		$content = apply_filters( $atom_name . '_content', $atom_vars['content'] );
 
+		$open = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
+		$close = '</' . $tag . '>';
+
 		// Handling the atom output differs based on the tag type.
 		switch ( $atom_vars['tag_type'] ) {
 
@@ -299,10 +302,18 @@ class Atom {
 
 				break;
 
+			// For complex nesting situations
+			case 'split':
+
+				$atom_markup['open'] = $open;
+				$atom_markup['close'] = $close;
+
+				break;
+
 			// Standard tags return text inside of the tag.
 			default:
 
-				$atom_markup = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>' . $content . '</' . $tag . '>';
+				$atom_markup = $open . $content . $close;
 
 				break;
 		}
