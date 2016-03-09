@@ -37,7 +37,7 @@ class Atom {
 	 * }
 	 * @return string $atom_markup | Atom markup
 	 */
-	public static function Assemble( $atom_name, $atom_args=array() ) {
+	public static function Assemble( $atom_name, $atom_args = array() ) {
 
 		$atom_vars       = self::ConfigureAtomArgs( $atom_name, $atom_args );
 		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'] );
@@ -111,64 +111,65 @@ class Atom {
 		$atom_attributes = array();
 
 		// Loop through each attribute supplied
-		foreach ( $raw_atom_attributes as $attribute_name => $raw_attribute_values ) {
+		if ( $raw_atom_attributes ) {
+			foreach ( $raw_atom_attributes as $attribute_name => $raw_attribute_values ) {
 
-			// Reset, just in case.
-			$attribute_values = '';
+				// Reset, just in case.
+				$attribute_values = '';
 
-			// Some attributes have special cases.
-			switch ( $attribute_name ) {
+				// Some attributes have special cases.
+				switch ( $attribute_name ) {
 
-				// The class attribute is double-checked against a sanitize function.
-				case 'class':
+					// The class attribute is double-checked against a sanitize function.
+					case 'class':
 
-					$atom_attributes['class'] = $attribute_name . '="' . self::getClasses( $atom_name, $raw_attribute_values ) . '"';
+						$atom_attributes['class'] = $attribute_name . '="' . self::getClasses( $atom_name, $raw_attribute_values ) . '"';
 
-					break;
+						break;
 
-				// The ID attribute is also double-checked against a sanitize function.
-				case 'id':
+					// The ID attribute is also double-checked against a sanitize function.
+					case 'id':
 
-					$atom_attributes['id'] = $attribute_name . '="' . self::getID( $atom_name, $raw_attribute_values ) . '"';;
+						$atom_attributes['id'] = $attribute_name . '="' . self::getID( $atom_name, $raw_attribute_values ) . '"';;
 
-					break;
+						break;
 
-				// Default behavior: any other attribute.
-				default:
+					// Default behavior: any other attribute.
+					default:
 
-					// Determine attribute values. They can be passed in as
-					// an array, or a string, whichever is more convenient.
-					if ( '' !== $raw_attribute_values ) {
+						// Determine attribute values. They can be passed in as
+						// an array, or a string, whichever is more convenient.
+						if ( '' !== $raw_attribute_values ) {
 
-						if ( is_array( $raw_attribute_values ) ) {
+							if ( is_array( $raw_attribute_values ) ) {
 
-							// Example: 'class' => ['class1', 'class2'] becomes class="class1 class2"
-							$attribute_values = implode( " ", $raw_attribute_values );
+								// Example: 'class' => ['class1', 'class2'] becomes class="class1 class2"
+								$attribute_values = implode( " ", $raw_attribute_values );
 
-						} elseif ( is_string( $raw_attribute_values ) ) {
+							} elseif ( is_string( $raw_attribute_values ) ) {
 
-							$attribute_values = $raw_attribute_values;
+								$attribute_values = $raw_attribute_values;
+
+							}
+
+							// Filter the attribute value
+							$attribute_values = apply_filters( $atom_name . $attribute_name . '_value', $attribute_values );
+
+							// Set up the attribute
+							$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
+
+						} else {
+
+							// Set up a blank attribute
+							$atom_attributes[ $attribute_name ] = $attribute_name;
 
 						}
 
-						// Filter the attribute value
-						$attribute_values = apply_filters( $atom_name . $attribute_name . '_value', $attribute_values );
+						break;
 
-						// Set up the attribute
-						$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
-
-					} else {
-
-						// Set up a blank attribute
-						$atom_attributes[ $attribute_name ] = $attribute_name;
-
-					}
-
-					break;
-
+				}
 			}
 		}
-
 		// Apply atom attributes filter
 		$atom_attributes = apply_filters( $atom_name . '_attributes', $atom_attributes );
 
@@ -289,7 +290,7 @@ class Atom {
 
 		$content = apply_filters( $atom_name . '_content', $atom_vars['content'] );
 
-		$open = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
+		$open  = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
 		$close = '</' . $tag . '>';
 
 		// Handling the atom output differs based on the tag type.
@@ -305,7 +306,7 @@ class Atom {
 			// For complex nesting situations
 			case 'split':
 
-				$atom_markup['open'] = $open;
+				$atom_markup['open']  = $open;
 				$atom_markup['close'] = $close;
 
 				break;
