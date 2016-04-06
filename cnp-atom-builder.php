@@ -1,6 +1,9 @@
 <?php
 namespace CNP;
 
+define( 'CNPATOM_DEBUG_PAGE', false );
+define( 'CNPATOM_DEBUG_FILE', false );
+
 /**
  * Class: Atom Builder
  *
@@ -28,7 +31,9 @@ class Atom {
 	 *      Atom arguments
 	 *
 	 * @type string $tag The atom's tag. Default: 'div'.
-	 * @type string $tag_type Optional. Use 'self-closing' for tags like <img /> or <input />. Default: ''.
+	 * @type string $tag_type Optional. Use 'self-closing' for tags like <img /> or <input />. Use 'split' for tags that
+	 *                                  have items nested inside them. Use 'false_without_content' (TODO: refactor name)
+	 *                                  to set up an atom that returns nothing without content. Default: ''.
 	 * @type string $content The content to insert between the atom tags.
 	 * @type array $attributes Optional. Any attributes to include on the atom's tag, like 'class' or 'id'.
 	 *                              Name-value pairs become the attributes on the tag, e.g.,
@@ -37,7 +42,7 @@ class Atom {
 	 * }
 	 * @return string $atom_markup | Atom markup
 	 */
-	public static function Assemble( $atom_name, $atom_args=array() ) {
+	public static function Assemble( $atom_name, $atom_args = array() ) {
 
 		$atom_vars       = self::ConfigureAtomArgs( $atom_name, $atom_args );
 		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'] );
@@ -78,7 +83,9 @@ class Atom {
 		$atom_vars = wp_parse_args( $atom_args, $atom_defaults );
 
 		// Usage: add_filter( $atom_name . '_args', $atom_vars );
-		$atom_vars = apply_filters( $atom_name . '_args', $atom_vars );
+		$atom_name_args_filter = $atom_name . '_args';
+		$atom_vars             = apply_filters( $atom_name_args_filter, $atom_vars );
+		self::AddDebugEntry( 'Filter', $atom_name_args_filter );
 
 		// Return vars, args are no longer used.
 		return $atom_vars;
@@ -103,6 +110,7 @@ class Atom {
 	 */
 	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
 
+		// Ensure that a class name is set.
 		if ( empty( $raw_atom_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
 			$raw_atom_attributes['class'] = $atom_name;
 		}
@@ -110,7 +118,7 @@ class Atom {
 		// Set up return variable
 		$atom_attributes = array();
 
-		// Loop through each attribute supplied
+		// Loop through each attribute supplied. We don't need an isset check for $raw_atom_attributes b/c of line 107.
 		foreach ( $raw_atom_attributes as $attribute_name => $raw_attribute_values ) {
 
 			// Reset, just in case.
@@ -151,10 +159,13 @@ class Atom {
 
 						}
 
-						// Filter the attribute value
-						$attribute_values = apply_filters( $atom_name . $attribute_name . '_value', $attribute_values );
+						// Filter the attribute value. Usage: add_filter( $atom_name_$attribute_name_value );
+						$atom_name_attribute_value_filter = $atom_name . '_' . $attribute_name . '_value';
+						$attribute_values                 = apply_filters( $atom_name_attribute_value_filter, $attribute_values );
+						self::AddDebugEntry( 'Filter', $atom_name_attribute_value_filter );
 
-						// Set up the attribute
+
+						// Set up the attribute.
 						$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
 
 					} else {
@@ -170,7 +181,9 @@ class Atom {
 		}
 
 		// Apply atom attributes filter
-		$atom_attributes = apply_filters( $atom_name . '_attributes', $atom_attributes );
+		$atom_name_attributes_filter = $atom_name . '_attributes';
+		$atom_attributes             = apply_filters( $atom_name_attributes_filter, $atom_attributes );
+		self::AddDebugEntry( 'Filter', $atom_name_attributes_filter );
 
 		// Return atom attributes
 		return $atom_attributes;
@@ -211,7 +224,9 @@ class Atom {
 		}
 
 		// Apply any filters
-		$classes_arr = apply_filters( $atom_name . '_classes', $classes_arr );
+		$atom_name_classes_filter = $atom_name . '_classes';
+		$classes_arr              = apply_filters( $atom_name_classes_filter, $classes_arr );
+		self::AddDebugEntry( 'Filter', $atom_name_classes_filter );
 
 		// Filter out duplicates
 		$classes_arr = array_filter( $classes_arr );
@@ -259,7 +274,9 @@ class Atom {
 		}
 
 		// Apply ID filter
-		$id = apply_filters( $atom_name . '_id', $id );
+		$atom_name_id_filter = $atom_name . '_id';
+		$id                  = apply_filters( $atom_name_id_filter, $id );
+		self::AddDebugEntry( 'Filter', $atom_name_id_filter );
 
 		return $id;
 
@@ -287,9 +304,11 @@ class Atom {
 
 		$tag = $atom_vars['tag'];
 
-		$content = apply_filters( $atom_name . '_content', $atom_vars['content'] );
+		$atom_name_content_filter = $atom_name . '_content';
+		$content                  = apply_filters( $atom_name_content_filter, $atom_vars['content'] );
+		self::AddDebugEntry( 'Filter', $atom_name_content_filter );
 
-		$open = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
+		$open  = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
 		$close = '</' . $tag . '>';
 
 		// Handling the atom output differs based on the tag type.
@@ -305,8 +324,18 @@ class Atom {
 			// For complex nesting situations
 			case 'split':
 
-				$atom_markup['open'] = $open;
+				$atom_markup['open']  = $open;
 				$atom_markup['close'] = $close;
+
+				break;
+
+			case 'false_without_content':
+
+				if ( ! empty( $content ) ) {
+					$atom_markup = $open . $content . $close;
+				} else {
+					$atom_markup = '';
+				}
 
 				break;
 
@@ -318,9 +347,43 @@ class Atom {
 				break;
 		}
 
-		$atom_markup = apply_filters( $atom_name . '_markup', $atom_markup );
+		$atom_name_markup_filter = $atom_name . '_markup';
+		$atom_markup             = apply_filters( $atom_name_markup_filter, $atom_markup );
+		self::AddDebugEntry( 'Filter', $atom_name_markup_filter );
 
 		return $atom_markup;
 
+	}
+
+	/**
+	 * AddDebugEntry
+	 */
+	public static function AddDebugEntry( $entry_type, $entry_message ) {
+
+		$log_type = '';
+
+		if ( true === CNPATOM_DEBUG_FILE ) {
+			$log_type = 'file';
+		}
+		if ( true === CNPATOM_DEBUG_PAGE ) {
+			$log_type = 'page';
+		}
+
+		$entry = "CNP Atom | $entry_type: $entry_message \r\n";
+
+		switch ( $log_type ) {
+
+			case 'file':
+
+				error_log( $entry, 3, WP_CONTENT_DIR . '/debug.log' );
+
+				break;
+
+			case 'page':
+
+				echo( $entry . '<br />' );
+
+				break;
+		}
 	}
 }
