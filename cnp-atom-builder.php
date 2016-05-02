@@ -207,7 +207,7 @@ class Atom {
 	 *
 	 * @return string $classes | A space-delimited string of classes.
 	 */
-	private static function getClasses( $atom_name, $raw_classes ) {
+	public static function getClasses( $atom_name, $raw_classes ) {
 
 		$classes_arr = array();
 
@@ -255,7 +255,7 @@ class Atom {
 	 *
 	 * @return string $id | A single ID.
 	 */
-	private static function getID( $atom_name, $raw_id ) {
+	public static function getID( $atom_name, $raw_id ) {
 
 		/* @EXIT: sanity check */
 		if ( ! is_string( $raw_id ) || '' == $raw_id ) {
