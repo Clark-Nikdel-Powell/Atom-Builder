@@ -298,7 +298,7 @@ class Atom {
 	 *
 	 * @filter $atom_name_markup | Use this filter to adjust the atom markup
 	 *
-	 * @return string $atom_markup
+	 * @return string|array $atom_markup
 	 */
 	public static function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
 
@@ -336,6 +336,12 @@ class Atom {
 				} else {
 					$atom_markup = '';
 				}
+
+				break;
+
+			case 'content-only':
+
+				$atom_markup = $content;
 
 				break;
 
