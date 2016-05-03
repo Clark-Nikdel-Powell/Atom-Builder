@@ -45,7 +45,7 @@ class Atom {
 	public static function Assemble( $atom_name, $atom_args = array() ) {
 
 		$atom_vars       = self::ConfigureAtomArgs( $atom_name, $atom_args );
-		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'] );
+		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'], $atom_vars );
 		$atom_markup     = self::BuildAtom( $atom_name, $atom_vars, $atom_attributes );
 
 		return $atom_markup;
@@ -72,12 +72,13 @@ class Atom {
 	public static function ConfigureAtomArgs( $atom_name, $atom_args ) {
 
 		// Set up defaults args
-		$atom_defaults = array(
+		$atom_defaults = [
 			'tag'        => 'div',
 			'tag_type'   => '',
 			'content'    => '',
-			'attributes' => array()
-		);
+			'attributes' => array(),
+			'attribute_quote_style' => '"'
+		];
 
 		// Parse the args
 		$atom_vars = wp_parse_args( $atom_args, $atom_defaults );
@@ -108,7 +109,7 @@ class Atom {
 	 *
 	 * @return array $atom_attributes | Atom Attributes
 	 */
-	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes ) {
+	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes, $atom_vars ) {
 
 		// Ensure that a class name is set.
 		if ( empty( $raw_atom_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
@@ -166,7 +167,7 @@ class Atom {
 
 
 						// Set up the attribute.
-						$atom_attributes[ $attribute_name ] = $attribute_name . '="' . $attribute_values . '"';
+						$atom_attributes[ $attribute_name ] = $attribute_name . '='. $atom_vars['attribute_quote_style'] . $attribute_values . $atom_vars['attribute_quote_style'];
 
 					} else {
 
