@@ -63,7 +63,7 @@ class Atom {
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param array $atom_args | Refer to Assemble for full arguments.
 	 *
-	 * @see self::Assemble, CNP\Molecule::Assemble
+	 * @see self::Assemble
 	 *
 	 * @filter $atomname_args | Use this filter to adjust the atom args.
 	 *
@@ -77,7 +77,9 @@ class Atom {
 			'tag_type'   => '',
 			'content'    => '',
 			'attributes' => array(),
-			'attribute_quote_style' => '"'
+			'attribute_quote_style' => '"',
+			'before' => '',
+			'after' => ''
 		];
 
 		// Parse the args
@@ -312,13 +314,16 @@ class Atom {
 		$open  = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
 		$close = '</' . $tag . '>';
 
+		$before = $atom_vars['before'];
+		$after = $atom_vars['after'];
+
 		// Handling the atom output differs based on the tag type.
 		switch ( $atom_vars['tag_type'] ) {
 
 			// Self-closing tags, like <img>, only have attributes.
 			case 'self-closing':
 
-				$atom_markup = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . ' />';
+				$atom_markup = $before . '<' . $tag . ' ' . implode( " ", $atom_attributes ) . ' />' . $after;
 
 				break;
 
@@ -333,7 +338,7 @@ class Atom {
 			case 'false_without_content':
 
 				if ( ! empty( $content ) ) {
-					$atom_markup = $open . $content . $close;
+					$atom_markup = $before . $open . $content . $close . $after;
 				} else {
 					$atom_markup = '';
 				}
@@ -342,14 +347,14 @@ class Atom {
 
 			case 'content-only':
 
-				$atom_markup = $content;
+				$atom_markup = $before . $content . $after;
 
 				break;
 
 			// Standard tags return text inside of the tag.
 			default:
 
-				$atom_markup = $open . $content . $close;
+				$atom_markup = $before . $open . $content . $close . $after;
 
 				break;
 		}
