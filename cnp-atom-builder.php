@@ -73,13 +73,13 @@ class Atom {
 
 		// Set up defaults args
 		$atom_defaults = [
-			'tag'        => 'div',
-			'tag_type'   => '',
-			'content'    => '',
-			'attributes' => array(),
+			'tag'                   => 'div',
+			'tag_type'              => '',
+			'content'               => '',
+			'attributes'            => array(),
 			'attribute_quote_style' => '"',
-			'before' => '',
-			'after' => ''
+			'before'                => '',
+			'after'                 => ''
 		];
 
 		// Parse the args
@@ -169,7 +169,7 @@ class Atom {
 
 
 						// Set up the attribute.
-						$atom_attributes[ $attribute_name ] = $attribute_name . '='. $atom_vars['attribute_quote_style'] . $attribute_values . $atom_vars['attribute_quote_style'];
+						$atom_attributes[ $attribute_name ] = $attribute_name . '=' . $atom_vars['attribute_quote_style'] . esc_attr($attribute_values) . $atom_vars['attribute_quote_style'];
 
 					} else {
 
@@ -315,7 +315,7 @@ class Atom {
 		$close = '</' . $tag . '>';
 
 		$before = $atom_vars['before'];
-		$after = $atom_vars['after'];
+		$after  = $atom_vars['after'];
 
 		// Handling the atom output differs based on the tag type.
 		switch ( $atom_vars['tag_type'] ) {
