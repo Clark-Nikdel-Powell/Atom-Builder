@@ -42,18 +42,18 @@ class Atom {
 	 * }
 	 * @return string $atom_markup | Atom markup
 	 */
-	public static function Assemble( $atom_name, $atom_args = array() ) {
+	public static function assemble( $atom_name, $atom_args = array() ) {
 
-		$atom_vars       = self::ConfigureAtomArgs( $atom_name, $atom_args );
-		$atom_attributes = self::ConfigureAtomAttributes( $atom_name, $atom_vars['attributes'], $atom_vars );
-		$atom_markup     = self::BuildAtom( $atom_name, $atom_vars, $atom_attributes );
+		$atom_vars       = self::configure_atom_args( $atom_name, $atom_args );
+		$atom_attributes = self::configure_atom_attributes( $atom_name, $atom_vars['attributes'], $atom_vars );
+		$atom_markup     = self::build_atom( $atom_name, $atom_vars, $atom_attributes );
 
 		return $atom_markup;
 
 	}
 
 	/**
-	 * ConfigureAtomArgs
+	 * configure_atom_args
 	 *
 	 * Parses supplied args vs. defaults and returns atom vars.
 	 *
@@ -63,13 +63,13 @@ class Atom {
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param array $atom_args | Refer to Assemble for full arguments.
 	 *
-	 * @see self::Assemble
+	 * @see self::assemble
 	 *
 	 * @filter $atomname_args | Use this filter to adjust the atom args.
 	 *
 	 * @return array $atom_vars | Atom Vars
 	 */
-	public static function ConfigureAtomArgs( $atom_name, $atom_args ) {
+	public static function configure_atom_args( $atom_name, $atom_args ) {
 
 		// Set up defaults args
 		$atom_defaults = [
@@ -79,7 +79,7 @@ class Atom {
 			'attributes'            => array(),
 			'attribute_quote_style' => '"',
 			'before'                => '',
-			'after'                 => ''
+			'after'                 => '',
 		];
 
 		// Parse the args
@@ -88,7 +88,7 @@ class Atom {
 		// Usage: add_filter( $atom_name . '_args', $atom_vars );
 		$atom_name_args_filter = $atom_name . '_args';
 		$atom_vars             = apply_filters( $atom_name_args_filter, $atom_vars );
-		self::AddDebugEntry( 'Filter', $atom_name_args_filter );
+		self::add_debug_entry( 'Filter', $atom_name_args_filter );
 
 		// Return vars, args are no longer used.
 		return $atom_vars;
@@ -96,7 +96,7 @@ class Atom {
 	}
 
 	/**
-	 * ConfigureAtomAttributes
+	 * configure_atom_attributes
 	 *
 	 * Sets up atom attributes, includes
 	 *
@@ -104,14 +104,15 @@ class Atom {
 	 *
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param array $raw_atom_attributes | Name-value pairs of atom attributes.
+	 * @param array $atom_vars | Atom args run through configure_atom_args.
 	 *
-	 * @see self::Assemble, CNP\Molecule::Assemble
+	 * @see self::assemble, CNP\Molecule::Assemble
 	 *
 	 * @filter $atomname_attributes | Use this filter to adjust the atom attributes.
 	 *
 	 * @return array $atom_attributes | Atom Attributes
 	 */
-	public static function ConfigureAtomAttributes( $atom_name, $raw_atom_attributes, $atom_vars ) {
+	public static function configure_atom_attributes( $atom_name, $raw_atom_attributes, $atom_vars ) {
 
 		// Ensure that a class name is set.
 		if ( empty( $raw_atom_attributes ) || ! isset( $raw_atom_attributes['class'] ) ) {
@@ -133,14 +134,14 @@ class Atom {
 				// The class attribute is double-checked against a sanitize function.
 				case 'class':
 
-					$atom_attributes['class'] = $attribute_name . '="' . self::getClasses( $atom_name, $raw_attribute_values ) . '"';
+					$atom_attributes['class'] = $attribute_name . '="' . self::get_classes( $atom_name, $raw_attribute_values ) . '"';
 
 					break;
 
 				// The ID attribute is also double-checked against a sanitize function.
 				case 'id':
 
-					$atom_attributes['id'] = $attribute_name . '="' . self::getID( $atom_name, $raw_attribute_values ) . '"';;
+					$atom_attributes['id'] = $attribute_name . '="' . self::get_id( $atom_name, $raw_attribute_values ) . '"';;
 
 					break;
 
@@ -154,7 +155,7 @@ class Atom {
 						if ( is_array( $raw_attribute_values ) ) {
 
 							// Example: 'class' => ['class1', 'class2'] becomes class="class1 class2"
-							$attribute_values = implode( " ", $raw_attribute_values );
+							$attribute_values = implode( ' ', $raw_attribute_values );
 
 						} elseif ( is_string( $raw_attribute_values ) ) {
 
@@ -165,11 +166,10 @@ class Atom {
 						// Filter the attribute value. Usage: add_filter( $atom_name_$attribute_name_value );
 						$atom_name_attribute_value_filter = $atom_name . '_' . $attribute_name . '_value';
 						$attribute_values                 = apply_filters( $atom_name_attribute_value_filter, $attribute_values );
-						self::AddDebugEntry( 'Filter', $atom_name_attribute_value_filter );
-
+						self::add_debug_entry( 'Filter', $atom_name_attribute_value_filter );
 
 						// Set up the attribute.
-						$atom_attributes[ $attribute_name ] = $attribute_name . '=' . $atom_vars['attribute_quote_style'] . esc_attr($attribute_values) . $atom_vars['attribute_quote_style'];
+						$atom_attributes[ $attribute_name ] = $attribute_name . '=' . $atom_vars['attribute_quote_style'] . esc_attr( $attribute_values ) . $atom_vars['attribute_quote_style'];
 
 					} else {
 
@@ -186,7 +186,7 @@ class Atom {
 		// Apply atom attributes filter
 		$atom_name_attributes_filter = $atom_name . '_attributes';
 		$atom_attributes             = apply_filters( $atom_name_attributes_filter, $atom_attributes );
-		self::AddDebugEntry( 'Filter', $atom_name_attributes_filter );
+		self::add_debug_entry( 'Filter', $atom_name_attributes_filter );
 
 		// Return atom attributes
 		return $atom_attributes;
@@ -194,14 +194,14 @@ class Atom {
 	}
 
 	/**
-	 * getClasses
+	 * get_classes
 	 *
 	 * Sanitizes and returns the provided classes as a strong
 	 *
 	 * @since 0.1
 	 * @access private
 	 *
-	 * @see ConfigureAtomAttributes
+	 * @see configure_atom_attributes
 	 *
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param string|array $raw_classes | The classes to check.
@@ -210,7 +210,7 @@ class Atom {
 	 *
 	 * @return string $classes | A space-delimited string of classes.
 	 */
-	public static function getClasses( $atom_name, $raw_classes ) {
+	public static function get_classes( $atom_name, $raw_classes ) {
 
 		$classes_arr = array();
 
@@ -221,35 +221,42 @@ class Atom {
 			$classes_arr = $raw_classes;
 		}
 
-		// Sanitize each class
-		foreach ( $classes_arr as $class_index => $class ) {
-			$classes_arr[ $class_index ] = sanitize_html_class( $class );
-		}
-
 		// Apply any filters
 		$atom_name_classes_filter = $atom_name . '_classes';
 		$classes_arr              = apply_filters( $atom_name_classes_filter, $classes_arr );
-		self::AddDebugEntry( 'Filter', $atom_name_classes_filter );
+		self::add_debug_entry( 'Filter', $atom_name_classes_filter );
+
+		// Sanitize each class
+		foreach ( $classes_arr as $class_index => $class ) {
+
+			$sanitized_class = sanitize_html_class( $class );
+
+			$generic_class_filter = 'cnp_modify_css_class';
+			$filtered_class = apply_filters( $generic_class_filter, $sanitized_class );
+			self::add_debug_entry( 'Filter', $generic_class_filter );
+
+			$classes_arr[ $class_index ] = $filtered_class;
+		}
 
 		// Filter out duplicates
 		$classes_arr = array_filter( $classes_arr );
 
 		// Convert to space-delimited string
-		$classes = implode( " ", $classes_arr );
+		$classes = implode( ' ', $classes_arr );
 
 		return $classes;
 
 	}
 
 	/**
-	 * getID
+	 * get_id
 	 *
 	 * Sanitizes and returns the provided ID.
 	 *
 	 * @since 0.1
 	 * @access private
 	 *
-	 * @see ConfigureAtomAttributes
+	 * @see configure_atom_attributes
 	 *
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param string|array $raw_id | The ID to check.
@@ -258,7 +265,7 @@ class Atom {
 	 *
 	 * @return string $id | A single ID.
 	 */
-	public static function getID( $atom_name, $raw_id ) {
+	public static function get_id( $atom_name, $raw_id ) {
 
 		/* @EXIT: sanity check */
 		if ( ! is_string( $raw_id ) || '' == $raw_id ) {
@@ -279,21 +286,21 @@ class Atom {
 		// Apply ID filter
 		$atom_name_id_filter = $atom_name . '_id';
 		$id                  = apply_filters( $atom_name_id_filter, $id );
-		self::AddDebugEntry( 'Filter', $atom_name_id_filter );
+		self::add_debug_entry( 'Filter', $atom_name_id_filter );
 
 		return $id;
 
 	}
 
 	/**
-	 * BuildAtom
+	 * build_atom
 	 *
 	 * Assembles and returns the atom markup.
 	 *
 	 * @since 0.1
 	 * @access protected
 	 *
-	 * @see self::Assemble
+	 * @see self::assemble
 	 *
 	 * @param string $atom_name | A hyphenated atom name.
 	 * @param array $atom_vars | Used for the atom tag & content.
@@ -303,15 +310,15 @@ class Atom {
 	 *
 	 * @return string|array $atom_markup
 	 */
-	public static function BuildAtom( $atom_name, $atom_vars, $atom_attributes ) {
+	public static function build_atom( $atom_name, $atom_vars, $atom_attributes ) {
 
 		$tag = $atom_vars['tag'];
 
 		$atom_name_content_filter = $atom_name . '_content';
 		$content                  = apply_filters( $atom_name_content_filter, $atom_vars['content'] );
-		self::AddDebugEntry( 'Filter', $atom_name_content_filter );
+		self::add_debug_entry( 'Filter', $atom_name_content_filter );
 
-		$open  = '<' . $tag . ' ' . implode( " ", $atom_attributes ) . '>';
+		$open  = '<' . $tag . ' ' . implode( ' ', $atom_attributes ) . '>';
 		$close = '</' . $tag . '>';
 
 		$before = $atom_vars['before'];
@@ -323,7 +330,7 @@ class Atom {
 			// Self-closing tags, like <img>, only have attributes.
 			case 'self-closing':
 
-				$atom_markup = $before . '<' . $tag . ' ' . implode( " ", $atom_attributes ) . ' />' . $after;
+				$atom_markup = $before . '<' . $tag . ' ' . implode( ' ', $atom_attributes ) . ' />' . $after;
 
 				break;
 
@@ -361,16 +368,19 @@ class Atom {
 
 		$atom_name_markup_filter = $atom_name . '_markup';
 		$atom_markup             = apply_filters( $atom_name_markup_filter, $atom_markup );
-		self::AddDebugEntry( 'Filter', $atom_name_markup_filter );
+		self::add_debug_entry( 'Filter', $atom_name_markup_filter );
 
 		return $atom_markup;
 
 	}
 
 	/**
-	 * AddDebugEntry
+	 * add_debug_entry
+	 *
+	 * @param $entry_type
+	 * @param $entry_message
 	 */
-	public static function AddDebugEntry( $entry_type, $entry_message ) {
+	public static function add_debug_entry( $entry_type, $entry_message ) {
 
 		$log_type = '';
 
