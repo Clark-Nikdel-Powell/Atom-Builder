@@ -134,14 +134,14 @@ class Atom {
 				// The class attribute is double-checked against a sanitize function.
 				case 'class':
 
-					$atom_attributes['class'] = $attribute_name . '="' . self::get_classes( $atom_name, $raw_attribute_values ) . '"';
+					$atom_attributes['class'] = $attribute_name . '="' . Utility::get_classes( $atom_name, $raw_attribute_values ) . '"';
 
 					break;
 
 				// The ID attribute is also double-checked against a sanitize function.
 				case 'id':
 
-					$atom_attributes['id'] = $attribute_name . '="' . self::get_id( $atom_name, $raw_attribute_values ) . '"';;
+					$atom_attributes['id'] = $attribute_name . '="' . Utility::get_id( $atom_name, $raw_attribute_values ) . '"';;
 
 					break;
 
@@ -190,105 +190,6 @@ class Atom {
 
 		// Return atom attributes
 		return $atom_attributes;
-
-	}
-
-	/**
-	 * get_classes
-	 *
-	 * Sanitizes and returns the provided classes as a strong
-	 *
-	 * @since 0.1
-	 * @access private
-	 *
-	 * @see configure_atom_attributes
-	 *
-	 * @param string $atom_name | A hyphenated atom name.
-	 * @param string|array $raw_classes | The classes to check.
-	 *
-	 * @filter $atomname_classes | Use this filter to adjust the atom classes array.
-	 *
-	 * @return string $classes | A space-delimited string of classes.
-	 */
-	public static function get_classes( $atom_name, $raw_classes ) {
-
-		$classes_arr = array();
-
-		// Configure the raw classes in an array
-		if ( is_string( $raw_classes ) && '' !== $raw_classes ) {
-			$classes_arr = explode( ',', $raw_classes );
-		} elseif ( is_array( $raw_classes ) && ! empty( $raw_classes ) ) {
-			$classes_arr = $raw_classes;
-		}
-
-		// Apply any filters
-		$atom_name_classes_filter = $atom_name . '_classes';
-		$classes_arr              = apply_filters( $atom_name_classes_filter, $classes_arr );
-		self::add_debug_entry( 'Filter', $atom_name_classes_filter );
-
-		// Sanitize each class
-		foreach ( $classes_arr as $class_index => $class ) {
-
-			$sanitized_class = sanitize_html_class( $class );
-
-			$generic_class_filter = 'cnp_modify_css_class';
-			$filtered_class = apply_filters( $generic_class_filter, $sanitized_class );
-			self::add_debug_entry( 'Filter', $generic_class_filter );
-
-			$classes_arr[ $class_index ] = $filtered_class;
-		}
-
-		// Filter out duplicates
-		$classes_arr = array_filter( $classes_arr );
-
-		// Convert to space-delimited string
-		$classes = implode( ' ', $classes_arr );
-
-		return $classes;
-
-	}
-
-	/**
-	 * get_id
-	 *
-	 * Sanitizes and returns the provided ID.
-	 *
-	 * @since 0.1
-	 * @access private
-	 *
-	 * @see configure_atom_attributes
-	 *
-	 * @param string $atom_name | A hyphenated atom name.
-	 * @param string|array $raw_id | The ID to check.
-	 *
-	 * @filter $atomname_id | Use this filter to adjust the atom ID string.
-	 *
-	 * @return string $id | A single ID.
-	 */
-	public static function get_id( $atom_name, $raw_id ) {
-
-		/* @EXIT: sanity check */
-		if ( ! is_string( $raw_id ) || '' == $raw_id ) {
-			return false;
-		}
-
-		// Set up return variable
-		$id = '';
-
-		// Check to make sure we only have one ID.
-		$id_arr = explode( ' ', trim( $raw_id ) );
-
-		// Sanitize the first entry in the ID array.
-		if ( ! empty( $id_arr ) ) {
-			$id = sanitize_html_class( $id_arr[0] );
-		}
-
-		// Apply ID filter
-		$atom_name_id_filter = $atom_name . '_id';
-		$id                  = apply_filters( $atom_name_id_filter, $id );
-		self::add_debug_entry( 'Filter', $atom_name_id_filter );
-
-		return $id;
 
 	}
 
