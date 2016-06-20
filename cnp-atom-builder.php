@@ -134,14 +134,14 @@ class Atom {
 				// The class attribute is double-checked against a sanitize function.
 				case 'class':
 
-					$atom_attributes['class'] = $attribute_name . '="' . Utility::get_classes( $atom_name, $raw_attribute_values ) . '"';
+					$atom_attributes['class'] = $attribute_name . '="' . Utility::get_classes( $raw_attribute_values, $atom_name ) . '"';
 
 					break;
 
 				// The ID attribute is also double-checked against a sanitize function.
 				case 'id':
 
-					$atom_attributes['id'] = $attribute_name . '="' . Utility::get_id( $atom_name, $raw_attribute_values ) . '"';;
+					$atom_attributes['id'] = $attribute_name . '="' . Utility::get_id( $raw_attribute_values, $atom_name ) . '"';;
 
 					break;
 
