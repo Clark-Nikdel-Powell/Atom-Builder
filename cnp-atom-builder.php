@@ -80,15 +80,18 @@ class Atom {
 			'attribute_quote_style' => '"',
 			'before'                => '',
 			'after'                 => '',
+			'suppress_filters'      => false,
 		];
 
 		// Parse the args
 		$atom_vars = wp_parse_args( $atom_args, $atom_defaults );
 
 		// Usage: add_filter( $atom_name . '_args', $atom_vars );
-		$atom_name_args_filter = $atom_name . '_args';
-		$atom_vars             = apply_filters( $atom_name_args_filter, $atom_vars );
-		self::add_debug_entry( 'Filter', $atom_name_args_filter );
+		if ( false === $atom_vars['suppress_filters'] ) {
+			$atom_name_args_filter = $atom_name . '_args';
+			$atom_vars             = apply_filters( $atom_name_args_filter, $atom_vars );
+			self::add_debug_entry( 'Filter', $atom_name_args_filter );
+		}
 
 		// Return vars, args are no longer used.
 		return $atom_vars;
@@ -164,9 +167,11 @@ class Atom {
 						}
 
 						// Filter the attribute value. Usage: add_filter( $atom_name_$attribute_name_value );
-						$atom_name_attribute_value_filter = $atom_name . '_' . $attribute_name . '_value';
-						$attribute_values                 = apply_filters( $atom_name_attribute_value_filter, $attribute_values );
-						self::add_debug_entry( 'Filter', $atom_name_attribute_value_filter );
+						if ( false === $atom_vars['suppress_filters'] ) {
+							$atom_name_attribute_value_filter = $atom_name . '_' . $attribute_name . '_value';
+							$attribute_values                 = apply_filters( $atom_name_attribute_value_filter, $attribute_values );
+							self::add_debug_entry( 'Filter', $atom_name_attribute_value_filter );
+						}
 
 						// Set up the attribute.
 						$atom_attributes[ $attribute_name ] = $attribute_name . '=' . $atom_vars['attribute_quote_style'] . esc_attr( $attribute_values ) . $atom_vars['attribute_quote_style'];
@@ -184,9 +189,11 @@ class Atom {
 		}
 
 		// Apply atom attributes filter
-		$atom_name_attributes_filter = $atom_name . '_attributes';
-		$atom_attributes             = apply_filters( $atom_name_attributes_filter, $atom_attributes );
-		self::add_debug_entry( 'Filter', $atom_name_attributes_filter );
+		if ( false === $atom_vars['suppress_filters'] ) {
+			$atom_name_attributes_filter = $atom_name . '_attributes';
+			$atom_attributes             = apply_filters( $atom_name_attributes_filter, $atom_attributes );
+			self::add_debug_entry( 'Filter', $atom_name_attributes_filter );
+		}
 
 		// Return atom attributes
 		return $atom_attributes;
@@ -215,9 +222,13 @@ class Atom {
 
 		$tag = $atom_vars['tag'];
 
-		$atom_name_content_filter = $atom_name . '_content';
-		$content                  = apply_filters( $atom_name_content_filter, $atom_vars['content'] );
-		self::add_debug_entry( 'Filter', $atom_name_content_filter );
+		$content = $atom_vars['content'];
+
+		if ( false === $atom_vars['suppress_filters'] ) {
+			$atom_name_content_filter = $atom_name . '_content';
+			$content                  = apply_filters( $atom_name_content_filter, $atom_vars['content'] );
+			self::add_debug_entry( 'Filter', $atom_name_content_filter );
+		}
 
 		$open  = '<' . $tag . ' ' . implode( ' ', $atom_attributes ) . '>';
 		$close = '</' . $tag . '>';
@@ -267,9 +278,11 @@ class Atom {
 				break;
 		}
 
-		$atom_name_markup_filter = $atom_name . '_markup';
-		$atom_markup             = apply_filters( $atom_name_markup_filter, $atom_markup );
-		self::add_debug_entry( 'Filter', $atom_name_markup_filter );
+		if ( false === $atom_vars['suppress_filters'] ) {
+			$atom_name_markup_filter = $atom_name . '_markup';
+			$atom_markup             = apply_filters( $atom_name_markup_filter, $atom_markup );
+			self::add_debug_entry( 'Filter', $atom_name_markup_filter );
+		}
 
 		return $atom_markup;
 
