@@ -249,8 +249,10 @@ class Atom {
 			// For complex nesting situations
 			case 'split':
 
-				$atom_markup['open']  = $open;
-				$atom_markup['close'] = $close;
+				$atom_markup['before'] = $before;
+				$atom_markup['open']   = $open;
+				$atom_markup['close']  = $close;
+				$atom_markup['after']  = $after;
 
 				break;
 
